@@ -1,0 +1,8 @@
+<% content_for :title, "New care plan" %>
+<div class="page-head">
+  <div>
+    <h1>New care plan</h1>
+    <p class="lede">For <%= @patient.name %>. Add each supplement, the dose, and whether it is once or twice a day.</p>
+  </div>
+</div>
+<%= render "form", url: patient_care_plans_path(@patient) %>

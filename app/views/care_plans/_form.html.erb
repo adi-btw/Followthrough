@@ -1,0 +1,27 @@
+<%= render "shared/errors", record: @care_plan %>
+
+<%= form_with model: @care_plan, url: url, data: { controller: "recommendations" } do |form| %>
+  <div class="field">
+    <%= form.label :start_date, "Start date" %>
+    <%= form.date_field :start_date, required: true %>
+  </div>
+
+  <h2>Supplements</h2>
+  <div data-recommendations-target="container">
+    <%= form.fields_for :recommendations do |recommendation_form| %>
+      <%= render "recommendation_fields", form: recommendation_form %>
+    <% end %>
+  </div>
+
+  <template data-recommendations-target="template">
+    <%= form.fields_for :recommendations, Recommendation.new, child_index: "NEW_RECORD" do |recommendation_form| %>
+      <%= render "recommendation_fields", form: recommendation_form %>
+    <% end %>
+  </template>
+
+  <div class="actions">
+    <button type="button" class="button secondary" data-action="recommendations#add">Add supplement</button>
+    <%= form.submit "Save care plan" %>
+    <%= link_to "Cancel", @care_plan.persisted? ? @care_plan : @patient %>
+  </div>
+<% end %>

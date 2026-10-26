@@ -1,0 +1,19 @@
+<div class="recommendation-row">
+  <%= form.hidden_field :id %>
+  <%= form.hidden_field :_destroy %>
+  <div class="row-fields">
+    <div class="field">
+      <%= form.label :name, "Supplement" %>
+      <%= form.text_field :name, required: true, autocomplete: "off" %>
+    </div>
+    <div class="field">
+      <%= form.label :dose %>
+      <%= form.text_field :dose, required: true, placeholder: "1000 IU", autocomplete: "off" %>
+    </div>
+    <div class="field">
+      <%= form.label :times_per_day, "Schedule" %>
+      <%= form.select :times_per_day, [ [ "Once a day", 1 ], [ "Twice a day", 2 ] ] %>
+    </div>
+  </div>
+  <button type="button" class="text-button" data-action="recommendations#remove">Remove</button>
+</div>

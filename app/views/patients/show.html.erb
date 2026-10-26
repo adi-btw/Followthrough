@@ -1,0 +1,43 @@
+<% content_for :title, @patient.name %>
+<div class="page-head">
+  <div>
+    <h1><%= @patient.name %></h1>
+    <p class="lede">Care plans for this patient.</p>
+  </div>
+  <div class="actions">
+    <%= link_to "Edit name", edit_patient_path(@patient), class: "button secondary" %>
+    <%= link_to "New care plan", new_patient_care_plan_path(@patient), class: "button" %>
+  </div>
+</div>
+
+<% if @care_plans.empty? %>
+  <section class="card empty">
+    <p>No care plan yet.</p>
+    <%= link_to "Write a care plan", new_patient_care_plan_path(@patient) %>
+  </section>
+<% else %>
+  <div class="stack">
+    <% @care_plans.each do |plan| %>
+      <% adherence = plan.adherence %>
+      <article class="card plan">
+        <div class="percent">
+          <%= adherence_text(adherence) %>
+          <span>7-day adherence</span>
+        </div>
+        <div>
+          <div class="split">
+            <h2><%= link_to "Started #{plan.start_date.to_fs(:long)}", plan %></h2>
+            <% if plan.needs_follow_up %>
+              <span class="badge">Needs follow-up</span>
+            <% end %>
+          </div>
+          <ul class="supplement-list">
+            <% plan.recommendations.each do |recommendation| %>
+              <li><%= recommendation.name %>, <%= recommendation.dose %>, <%= schedule_label(recommendation.times_per_day).downcase %></li>
+            <% end %>
+          </ul>
+        </div>
+      </article>
+    <% end %>
+  </div>
+<% end %>

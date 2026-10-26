@@ -1,0 +1,12 @@
+<%= render "shared/errors", record: patient %>
+
+<%= form_with model: patient do |form| %>
+  <div class="field">
+    <%= form.label :name, "Patient name" %>
+    <%= form.text_field :name, required: true, autofocus: true, autocomplete: "off" %>
+  </div>
+  <div class="actions">
+    <%= form.submit patient.persisted? ? "Save patient" : "Add patient" %>
+    <%= link_to "Cancel", patient.persisted? ? patient : patients_path %>
+  </div>
+<% end %>

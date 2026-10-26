@@ -1,0 +1,26 @@
+<% content_for :title, "Patients" %>
+<div class="page-head">
+  <div>
+    <h1>Patients</h1>
+    <p class="lede">Names only. Keep this list fictional.</p>
+  </div>
+  <%= link_to "Add patient", new_patient_path, class: "button" %>
+</div>
+
+<% if @patients.empty? %>
+  <section class="card empty">
+    <p>No patients yet.</p>
+  </section>
+<% else %>
+  <div class="stack">
+    <% @patients.each do |patient| %>
+      <section class="card patient-name">
+        <div>
+          <h2><%= link_to patient.name, patient %></h2>
+          <p class="meta"><%= pluralize(patient.care_plans.size, "care plan") %></p>
+        </div>
+        <%= link_to "Open", patient, class: "button secondary" %>
+      </section>
+    <% end %>
+  </div>
+<% end %>

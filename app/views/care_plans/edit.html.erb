@@ -1,0 +1,8 @@
+<% content_for :title, "Edit care plan" %>
+<div class="page-head">
+  <div>
+    <h1>Edit care plan</h1>
+    <p class="lede"><%= @care_plan.patient.name %></p>
+  </div>
+</div>
+<%= render "form", url: care_plan_path(@care_plan) %>

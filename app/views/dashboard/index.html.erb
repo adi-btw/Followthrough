@@ -1,0 +1,55 @@
+<% content_for :title, "Dashboard" %>
+<div class="page-head">
+  <div>
+    <h1>Dashboard</h1>
+    <p class="lede">Each plan shows live 7-day adherence. Run the follow-up check to flag plans under 50%.</p>
+  </div>
+  <div class="actions">
+    <%= link_to "Add patient", new_patient_path, class: "button" %>
+    <%= button_to "Run follow-up check", follow_up_path, class: "button secondary" %>
+  </div>
+</div>
+
+<% if @patients.empty? %>
+  <section class="card empty">
+    <p>No patients yet.</p>
+    <%= link_to "Add your first patient", new_patient_path %>
+  </section>
+<% else %>
+  <div class="stack">
+    <% @patients.each do |patient| %>
+      <section class="card patient-block">
+        <div class="patient-name">
+          <h2><%= link_to patient.name, patient %></h2>
+          <%= link_to "New plan", new_patient_care_plan_path(patient) %>
+        </div>
+        <% if patient.care_plans.empty? %>
+          <p class="empty">No care plan yet.</p>
+        <% else %>
+          <% patient.care_plans.sort_by(&:start_date).reverse_each do |plan| %>
+            <% adherence = plan.adherence %>
+            <article class="plan">
+              <div class="percent">
+                <%= adherence_text(adherence) %>
+                <span>7-day adherence</span>
+              </div>
+              <div>
+                <div class="split">
+                  <h3><%= link_to "Started #{plan.start_date.to_fs(:long)}", plan %></h3>
+                  <% if plan.needs_follow_up %>
+                    <span class="badge">Needs follow-up</span>
+                  <% end %>
+                </div>
+                <ul class="supplement-list">
+                  <% plan.recommendations.each do |recommendation| %>
+                    <li><%= recommendation.name %>, <%= recommendation.dose %>, <%= schedule_label(recommendation.times_per_day).downcase %></li>
+                  <% end %>
+                </ul>
+              </div>
+            </article>
+          <% end %>
+        <% end %>
+      </section>
+    <% end %>
+  </div>
+<% end %>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Followthrough" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Followthrough">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <header class="site-header">
+      <div class="header-inner">
+        <%= link_to root_path, class: "brand" do %>
+          <span class="brand-mark" aria-hidden="true"></span>
+          Followthrough
+        <% end %>
+        <nav class="nav">
+          <% if authenticated? %>
+            <%= link_to "Dashboard", root_path %>
+            <%= link_to "Patients", patients_path %>
+            <span class="who"><%= Current.user.email_address %></span>
+            <%= button_to "Log out", session_path, method: :delete, class: "button ghost" %>
+          <% else %>
+            <%= link_to "Log in", new_session_path %>
+            <%= link_to "Sign up", new_registration_path, class: "button" %>
+          <% end %>
+        </nav>
+      </div>
+    </header>
+
+    <% if flash[:notice] %>
+      <div class="notice"><%= flash[:notice] %></div>
+    <% end %>
+    <% if flash[:alert] %>
+      <div class="alert"><%= flash[:alert] %></div>
+    <% end %>
+
+    <main class="page">
+      <%= yield %>
+    </main>
+
+    <footer class="site-footer">
+      <p>Portfolio demo with fictional data. Not a medical product. Not affiliated with Fullscript.</p>
+    </footer>
+  </body>
+</html>

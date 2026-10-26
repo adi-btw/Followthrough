@@ -1,0 +1,65 @@
+<% content_for :title, @care_plan.patient.name %>
+<% adherence = @care_plan.adherence %>
+<div class="page-head">
+  <div>
+    <p class="meta"><%= link_to @care_plan.patient.name, @care_plan.patient %></p>
+    <h1>Care plan</h1>
+    <p class="lede">Started <%= @care_plan.start_date.to_fs(:long) %>.</p>
+  </div>
+  <div class="actions">
+    <% if @care_plan.needs_follow_up %>
+      <span class="badge">Needs follow-up</span>
+    <% end %>
+    <%= link_to "Edit plan", edit_care_plan_path(@care_plan), class: "button secondary" %>
+  </div>
+</div>
+
+<section class="card gap">
+  <div class="percent">
+    <%= adherence_text(adherence) %>
+    <span>7-day adherence</span>
+  </div>
+  <p class="meta">
+    <%= adherence.taken_doses %> of <%= adherence.expected_doses %> expected doses in the last 7 days.
+    A day marked taken counts as every dose scheduled that day.
+  </p>
+</section>
+
+<section class="card">
+  <h2>Today</h2>
+  <% @care_plan.recommendations.each do |recommendation| %>
+    <% today = recommendation.check_ins.find { |check_in| check_in.taken_on == Date.current } %>
+    <div class="check-row">
+      <div>
+        <strong><%= recommendation.name %></strong>
+        <p class="meta"><%= recommendation.dose %> · <%= schedule_label(recommendation.times_per_day) %></p>
+        <div class="week" aria-label="Last 7 days">
+          <% ((Date.current - 6)..Date.current).each do |date| %>
+            <% check_in = recommendation.check_ins.find { |row| row.taken_on == date } %>
+            <% if date < @care_plan.start_date %>
+              <span class="day before" title="<%= date.to_fs(:long) %>">
+                <%= date.strftime("%a") %>
+                <strong>—</strong>
+              </span>
+            <% elsif check_in&.taken %>
+              <span class="day taken" title="<%= date.to_fs(:long) %>">
+                <%= date.strftime("%a") %>
+                <strong>Yes</strong>
+              </span>
+            <% else %>
+              <span class="day missed" title="<%= date.to_fs(:long) %>">
+                <%= date.strftime("%a") %>
+                <strong>No</strong>
+              </span>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+      <%= button_to (today&.taken ? "Taken today" : "Mark taken"),
+            care_plan_check_ins_path(@care_plan),
+            method: :post,
+            class: "toggle #{ "is-on" if today&.taken }",
+            params: { recommendation_id: recommendation.id, taken: today&.taken ? "0" : "1" } %>
+    </div>
+  <% end %>
+</section>

@@ -2,7 +2,7 @@
 
 A practitioner writes a short supplement care plan and needs to see whether the patient is keeping up. Followthrough is a small Rails app for that: sign in, add a patient, record a few supplements, and check the last seven days of adherence.
 
-This is a portfolio demo with fictional data. It is not a medical product, and it is not affiliated with Fullscript.
+This is a portfolio demo with fictional data. It is not a medical product, it does not store real patient information, and it is not affiliated with Fullscript.
 
 ## Run it
 
@@ -12,7 +12,9 @@ bin/rails db:prepare
 bin/rails server
 ```
 
-Open http://localhost:3000 and sign in as `practitioner@example.com` / `password`, or create your own account. `db:prepare` creates the database and loads the fictional patients. Run `bin/rails db:seed` again any time you want that demo data back.
+Open http://localhost:3000 and sign in as `practitioner@example.com` / `password`, or create your own account. `db:prepare` creates the database and, on a new database, loads the fictional patients. Run `bin/rails db:seed` any time you want that demo data back.
+
+On Windows PowerShell, if `bin/rails` is not recognized, prefix the commands with Ruby: `ruby bin/rails db:prepare`, `ruby bin/rails db:seed`, and `ruby bin/rails server`.
 
 This demo uses SQLite. Production-shaped apps in this space often use MySQL or PostgreSQL.
 
@@ -39,4 +41,4 @@ bin/rails test
 
 ## Resume bullet
 
-Built Followthrough, a Ruby on Rails app where a practitioner writes a supplement care plan and tracks 7-day patient adherence, including model tests and a Solid Queue follow-up job.
+- Built Followthrough, a Ruby on Rails app where a practitioner writes a supplement care plan and tracks 7-day patient adherence, including model tests and a Solid Queue follow-up job.

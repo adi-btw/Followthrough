@@ -15,51 +15,41 @@
 </div>
 
 <section class="card gap">
+  <h2>Patient link</h2>
+  <p class="meta">Share this private link. No login. It only records doses for this plan.</p>
+  <label for="patient-check-in-link">Check-in link</label>
+  <input id="patient-check-in-link" class="copy-link" type="text" readonly value="<%= patient_check_in_url(@care_plan.check_in_token) %>" onclick="this.select()">
+</section>
+
+<section class="card gap">
   <div class="percent">
     <%= adherence_text(adherence) %>
     <span>7-day adherence</span>
   </div>
   <p class="meta">
     <%= adherence.taken_doses %> of <%= adherence.expected_doses %> expected doses in the last 7 days.
-    A day marked taken counts as every dose scheduled that day.
+    Each morning or evening slot marked taken counts as one dose.
   </p>
 </section>
 
 <section class="card">
   <h2>Today</h2>
   <% @care_plan.recommendations.each do |recommendation| %>
-    <% today = recommendation.check_ins.find { |check_in| check_in.taken_on == Date.current } %>
     <div class="check-row">
       <div>
         <strong><%= recommendation.name %></strong>
         <p class="meta"><%= recommendation.dose %> · <%= schedule_label(recommendation.times_per_day) %></p>
         <div class="week" aria-label="Last 7 days">
           <% ((Date.current - 6)..Date.current).each do |date| %>
-            <% check_in = recommendation.check_ins.find { |row| row.taken_on == date } %>
-            <% if date < @care_plan.start_date %>
-              <span class="day before" title="<%= date.to_fs(:long) %>">
-                <%= date.strftime("%a") %>
-                <strong>—</strong>
-              </span>
-            <% elsif check_in&.taken %>
-              <span class="day taken" title="<%= date.to_fs(:long) %>">
-                <%= date.strftime("%a") %>
-                <strong>Yes</strong>
-              </span>
-            <% else %>
-              <span class="day missed" title="<%= date.to_fs(:long) %>">
-                <%= date.strftime("%a") %>
-                <strong>No</strong>
-              </span>
-            <% end %>
+            <% state, mark = day_summary(recommendation, date, @care_plan.start_date) %>
+            <span class="day <%= state %>" title="<%= date.to_fs(:long) %>">
+              <%= date.strftime("%a") %>
+              <strong><%= mark %></strong>
+            </span>
           <% end %>
         </div>
       </div>
-      <%= button_to (today&.taken ? "Taken today" : "Mark taken"),
-            care_plan_check_ins_path(@care_plan),
-            method: :post,
-            class: "toggle #{ "is-on" if today&.taken }",
-            params: { recommendation_id: recommendation.id, taken: today&.taken ? "0" : "1" } %>
+      <%= render "recommendations/slot_buttons", recommendation: recommendation, post_url: care_plan_check_ins_path(@care_plan) %>
     </div>
   <% end %>
 </section>

@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  get "check-in/:token", to: "patient_check_ins#show", as: :patient_check_in, constraints: { token: /[A-Za-z0-9]+/ }
+  post "check-in/:token", to: "patient_check_ins#create", constraints: { token: /[A-Za-z0-9]+/ }
+
   resource :session
   resources :passwords, param: :token
   resource :registration, only: %i[ new create ]

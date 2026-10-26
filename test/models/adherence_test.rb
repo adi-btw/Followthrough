@@ -42,12 +42,28 @@ class AdherenceTest < ActiveSupport::TestCase
     assert_equal 100, adherence.percentage
   end
 
-  test "twice daily expects and credits twice as many doses as once daily" do
+  test "twice daily with one slot taken is 50 percent for that line" do
+    plan = plan_with(start_date: @on - 30, times_per_day: 2, name: "Twice daily")
+    window.each do |day|
+      check_in(plan, day, taken: true, slot: "morning")
+      check_in(plan, day, taken: false, slot: "evening")
+    end
+
+    adherence = Adherence.for(plan, as_of: @on)
+
+    assert_equal 14, adherence.expected_doses
+    assert_equal 7, adherence.taken_doses
+    assert_equal 50, adherence.percentage
+    assert_not adherence.needs_follow_up?
+  end
+
+  test "twice daily with both slots taken is twice the doses of once daily" do
     once = plan_with(start_date: @on - 30, times_per_day: 1, name: "Once daily")
     twice = plan_with(start_date: @on - 30, times_per_day: 2, name: "Twice daily")
     window.each do |day|
-      check_in(once, day, taken: true)
-      check_in(twice, day, taken: true)
+      check_in(once, day, taken: true, slot: "morning")
+      check_in(twice, day, taken: true, slot: "morning")
+      check_in(twice, day, taken: true, slot: "evening")
     end
 
     once_adherence = Adherence.for(once, as_of: @on)
@@ -74,7 +90,7 @@ class AdherenceTest < ActiveSupport::TestCase
       )
     end
 
-    def check_in(plan, day, taken:)
-      plan.recommendations.first.check_ins.create!(taken_on: day, taken: taken)
+    def check_in(plan, day, taken:, slot: "morning")
+      plan.recommendations.first.check_ins.create!(taken_on: day, taken: taken, slot: slot)
     end
 end

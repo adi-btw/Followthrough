@@ -3,10 +3,16 @@ class CheckInsController < ApplicationController
 
   def create
     recommendation = @care_plan.recommendations.find(params[:recommendation_id])
-    check_in = recommendation.check_ins.find_or_initialize_by(taken_on: Date.current)
-    check_in.taken = ActiveModel::Type::Boolean.new.cast(params[:taken])
-    check_in.save!
-    redirect_to @care_plan, notice: "Today's check-in saved.", status: :see_other
+    saved = recommendation.record_dose!(
+      slot: params[:slot],
+      taken: ActiveModel::Type::Boolean.new.cast(params[:taken])
+    )
+
+    if saved
+      redirect_to @care_plan, notice: "Dose saved.", status: :see_other
+    else
+      redirect_to @care_plan, alert: "That dose is not scheduled.", status: :see_other
+    end
   end
 
   private

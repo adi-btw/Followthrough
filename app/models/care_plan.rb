@@ -1,4 +1,6 @@
 class CarePlan < ApplicationRecord
+  has_secure_token :check_in_token
+
   belongs_to :patient
   has_many :recommendations, dependent: :destroy
 

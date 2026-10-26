@@ -2,8 +2,8 @@
 #
 # Expected doses are times_per_day times the days the plan has been active
 # inside the window (as_of and the six days before it), summed across
-# recommendations. A check-in is once per recommendation per day, so a day
-# marked taken counts as that recommendation's times_per_day doses.
+# recommendations. Each scheduled slot is one dose. A taken check-in counts
+# as one dose for that slot. A missing or unmarked slot counts as zero.
 class Adherence
   WINDOW_DAYS = 7
 
@@ -26,9 +26,7 @@ class Adherence
   end
 
   def taken_doses
-    @recommendations.sum do |recommendation|
-      taken_days(recommendation) * recommendation.times_per_day.to_i
-    end
+    @recommendations.sum { |recommendation| taken_slots(recommendation) }
   end
 
   def rate
@@ -59,9 +57,10 @@ class Adherence
       @as_of - (WINDOW_DAYS - 1)
     end
 
-    def taken_days(recommendation)
+    def taken_slots(recommendation)
+      allowed = recommendation.slots
       rows = recommendation.check_ins.respond_to?(:to_a) ? recommendation.check_ins.to_a : recommendation.check_ins
-      rows.count { |check_in| dose_taken?(check_in) }
+      rows.count { |check_in| dose_taken?(check_in) && allowed.include?(check_in.slot) }
     end
 
     def dose_taken?(check_in)

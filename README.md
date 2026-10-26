@@ -22,7 +22,9 @@ This demo uses SQLite. Production-shaped apps in this space often use MySQL or P
 
 Adherence is doses taken divided by doses expected over the last 7 days, including today.
 
-Expected doses are `times_per_day` multiplied by the number of days the plan was active in that window, summed across the supplements on the plan. Days before the start date do not count. Each supplement has one check-in per day. A check-in marked taken counts as that day's full schedule (`times_per_day` doses). A missing or unmarked day counts as zero. The plan page shows the percentage and the dose counts.
+Expected doses are `times_per_day` multiplied by the number of days the plan was active in that window, summed across the supplements on the plan. Days before the start date do not count. A supplement taken once a day has a morning slot. A supplement taken twice a day has a morning slot and an evening slot. Only a slot marked taken counts as one dose. A missing or unmarked slot counts as zero.
+
+The practitioner plan page shows the percentage, the dose counts, and a private check-in link (`/check-in/:token`). That page needs no login. It lists today's supplements for that plan only. Each dose recorded there updates the same adherence numbers.
 
 `FollowUpJob` is a Solid Queue job. It sets `needs_follow_up` when that percentage is under 50%. The dashboard button runs the job immediately. To enqueue it instead:
 
@@ -41,4 +43,4 @@ bin/rails test
 
 ## Resume bullet
 
-- Built Followthrough, a Ruby on Rails app where a practitioner writes a supplement care plan and tracks 7-day patient adherence, including model tests and a Solid Queue follow-up job.
+- Built Followthrough, a Ruby on Rails app where a practitioner writes a supplement care plan, a patient records each dose from a private link, and a Solid Queue job flags plans under 50% 7-day adherence.

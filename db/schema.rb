@@ -10,13 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_26_190000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_26_201000) do
   create_table "care_plans", force: :cascade do |t|
     t.integer "patient_id", null: false
     t.date "start_date", null: false
     t.boolean "needs_follow_up", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "check_in_token", null: false
+    t.index ["check_in_token"], name: "index_care_plans_on_check_in_token", unique: true
     t.index ["patient_id"], name: "index_care_plans_on_patient_id"
   end
 
@@ -26,7 +28,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_190000) do
     t.boolean "taken", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["recommendation_id", "taken_on"], name: "index_check_ins_on_recommendation_id_and_taken_on", unique: true
+    t.string "slot", default: "morning", null: false
+    t.index ["recommendation_id", "taken_on", "slot"], name: "index_check_ins_on_recommendation_date_and_slot", unique: true
     t.index ["recommendation_id"], name: "index_check_ins_on_recommendation_id"
   end
 

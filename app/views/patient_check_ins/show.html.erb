@@ -1,0 +1,33 @@
+<% content_for :title, "Today's doses" %>
+<% adherence = @care_plan.adherence %>
+<div class="page-head">
+  <div>
+    <p class="meta">Private check-in</p>
+    <h1>Today's doses</h1>
+    <p class="lede"><%= @care_plan.patient.name %>. Mark each dose taken today.</p>
+  </div>
+</div>
+
+<section class="card gap">
+  <div class="percent">
+    <%= adherence_text(adherence) %>
+    <span>7-day adherence</span>
+  </div>
+  <p class="meta">
+    <%= adherence.taken_doses %> of <%= adherence.expected_doses %> expected doses.
+    Each slot counts as one dose.
+  </p>
+</section>
+
+<section class="card">
+  <h2><%= Date.current.to_fs(:long) %></h2>
+  <% @care_plan.recommendations.each do |recommendation| %>
+    <div class="check-row">
+      <div>
+        <strong><%= recommendation.name %></strong>
+        <p class="meta"><%= recommendation.dose %> · <%= schedule_label(recommendation.times_per_day) %></p>
+      </div>
+      <%= render "recommendations/slot_buttons", recommendation: recommendation, post_url: patient_check_in_path(@care_plan.check_in_token) %>
+    </div>
+  <% end %>
+</section>

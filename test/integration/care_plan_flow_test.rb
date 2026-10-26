@@ -32,5 +32,7 @@ class CarePlanFlowTest < ActionDispatch::IntegrationTest
     assert_match "1000 IU", response.body
     assert_match "7-day adherence", response.body
     assert_match "0%", response.body
+    assert_match "/check-in/#{plan.check_in_token}", response.body
+    assert_match "Mark morning", response.body
   end
 end

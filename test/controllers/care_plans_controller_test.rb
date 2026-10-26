@@ -32,5 +32,33 @@ class CarePlansControllerTest < ActionDispatch::IntegrationTest
     assert_match "Avery Quinn", response.body
     assert_match "Vitamin D", response.body
     assert_match "1000 IU", response.body
+    assert_match "/check-in/#{plan.check_in_token}", response.body
+  end
+
+  test "practitioner records one slot and adherence counts that dose" do
+    sign_in_as @user
+    patient = @user.patients.create!(name: "Avery Quinn")
+    plan = patient.care_plans.create!(
+      start_date: Date.current,
+      recommendations_attributes: [ { name: "Magnesium", dose: "200 mg", times_per_day: 2 } ]
+    )
+    recommendation = plan.recommendations.sole
+
+    post care_plan_check_ins_path(plan), params: {
+      recommendation_id: recommendation.id,
+      slot: "evening",
+      taken: "1"
+    }
+
+    assert_redirected_to care_plan_path(plan)
+    follow_redirect!
+    assert_response :success
+    assert_match "Evening taken", response.body
+    assert_match "Mark morning", response.body
+
+    plan.reload
+    assert_equal 1, plan.adherence.taken_doses
+    assert_equal 2, plan.adherence.expected_doses
+    assert_equal 50, plan.adherence.percentage
   end
 end

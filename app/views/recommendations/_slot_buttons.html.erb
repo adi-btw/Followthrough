@@ -1,0 +1,10 @@
+<div class="actions">
+  <% recommendation.slots.each do |slot| %>
+    <% taken = recommendation.dose_taken_on?(Date.current, slot) %>
+    <%= button_to (taken ? "#{slot_label(slot)} taken" : "Mark #{slot_label(slot).downcase}"),
+          post_url,
+          method: :post,
+          class: "toggle #{ "is-on" if taken }",
+          params: { recommendation_id: recommendation.id, slot: slot, taken: taken ? "0" : "1" } %>
+  <% end %>
+</div>
